@@ -25,23 +25,25 @@ namespace LibraryApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
             var connectionString = Configuration["connectionStrings:libraryDbConnectionString"];
             services.AddDbContext<LibraryDbContext>(c => c.UseSqlServer(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, LibraryDbContext context)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            //seeding 
+            //context.SeedDataContext();
+
+            //app.Run(async (context) =>
+            //{
+            //    await context.Response.WriteAsync("Hello World!");
+            //});
 
             app.UseMvc();
         }
