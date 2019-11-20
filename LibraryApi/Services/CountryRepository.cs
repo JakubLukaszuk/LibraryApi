@@ -35,7 +35,7 @@ namespace LibraryApi.Services
             return _contryContext.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault();
         }
 
-        public bool IsContryExists(int countryId)
+        public bool IsCountryExists(int countryId)
         {
             return _contryContext.Categories.Any(c => c.Id == countryId);
         }
