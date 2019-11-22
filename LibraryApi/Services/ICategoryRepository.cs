@@ -8,8 +8,10 @@ namespace LibraryApi.Services
 {
     interface ICategoryRepository
     {
-        List<Category> GetCategories();
+        ICollection<Category> GetCategories();
         Category GetCategory(int categoryId);
-        List<Category> GetCategoriesOfBook();
+        ICollection<Category> GetCategoriesOfBook(int bookId);
+        ICollection<Book> GetBooksOfCategories(int categoryId);
+        bool IsCategoryExist(int categoryId);
     }
 }

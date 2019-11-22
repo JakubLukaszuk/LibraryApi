@@ -8,29 +8,35 @@ namespace LibraryApi.Services
 {
     class CategoryRepository : ICategoryRepository
     {
-        public ICollection<Book> GetBooksOfCategories(int categoryId)
+        LibraryDbContext _categoryContext;
+        public CategoryRepository(LibraryDbContext categoryContext)
         {
-            throw new NotImplementedException();
+            _categoryContext = categoryContext;
         }
 
         public ICollection<Category> GetCategories()
         {
-            throw new NotImplementedException();
-        }
-
-        public ICollection<Category> GetCategoriesOfBook(int bookId)
-        {
-            throw new NotImplementedException();
+            return _categoryContext.Categories.ToList();
         }
 
         public Category GetCategory(int categoryId)
         {
-            throw new NotImplementedException();
+            return _categoryContext.Categories.Where(c => c.Id == c.Id).FirstOrDefault();
+        }
+
+        public ICollection<Book> GetBooksOfCategories(int categoryId)
+        {
+            return _categoryContext.BookCategories.Where(bc => bc.CategoryId == categoryId).Select(b => b.Book).ToList();
+        }
+
+        public ICollection<Category> GetCategoriesOfBook(int bookId)
+        {
+            return _categoryContext.BookCategories.Where(bc => bc.BookId == bookId).Select(c => c.Category).ToList();
         }
 
         public bool IsCategoryExist(int categoryId)
         {
-            throw new NotImplementedException();
+            return _categoryContext.Categories.Any(c => c.Id == categoryId);
         }
     }
 }
