@@ -22,6 +22,7 @@ namespace LibraryApi.Controllers
         //api/countries
         [HttpGet]
         [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<CountryDataTransferObjects>))]
         public IActionResult GetCountries()
         {
@@ -69,7 +70,7 @@ namespace LibraryApi.Controllers
         }
 
         //api/countries/authors/{authorId}
-        [HttpGet("{authorId}")]
+        [HttpGet("authors/{authorId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(CountryDataTransferObjects))]

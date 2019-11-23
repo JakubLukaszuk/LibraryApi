@@ -6,7 +6,7 @@ using LibraryApi.Models;
 
 namespace LibraryApi.Services
 {
-    class CategoryRepository : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         LibraryDbContext _categoryContext;
         public CategoryRepository(LibraryDbContext categoryContext)
@@ -21,7 +21,7 @@ namespace LibraryApi.Services
 
         public Category GetCategory(int categoryId)
         {
-            return _categoryContext.Categories.Where(c => c.Id == c.Id).FirstOrDefault();
+            return _categoryContext.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
         }
 
         public ICollection<Book> GetBooksOfCategories(int categoryId)

@@ -1,21 +1,98 @@
-﻿using LibraryApi.Services;
+﻿using LibraryApi.Models;
+using LibraryApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LibraryApi.Dtos;
 
 namespace LibraryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    class CategoriesController : Controller
+    public class CategoriesController : Controller
     {
-        private CategoryRepository _categoriesRepository;
+        private ICategoryRepository _categoryRepository;
 
-        public CategoriesController(CategoryRepository categoryRepository)
+        public CategoriesController(ICategoryRepository categoryRepository)
         {
-            _categoriesRepository = categoryRepository;
+            _categoryRepository = categoryRepository;
         }
+
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDataTransferObjects>))]
+        public IActionResult GetCategories()
+        {
+
+            ICollection<Category> categoires = _categoryRepository.GetCategories();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countreisDtoList = new  List<CategoryDataTransferObjects>();
+            foreach (Category category in categoires)
+            {
+                countreisDtoList.Add( new CategoryDataTransferObjects
+                {
+                    Name = category.Name,
+                    Id = category.Id
+                });
+
+            }
+
+            return Ok(countreisDtoList);
+        }
+
+        [HttpGet("{categoryId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(CategoryDataTransferObjects))]
+        public IActionResult GetCategory(int categoryId)
+        {
+            Category category = _categoryRepository.GetCategory(categoryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            CategoryDataTransferObjects categoryDto =
+                new CategoryDataTransferObjects
+                {
+                    Name = category.Name,
+                    Id = category.Id
+                };
+
+            return Ok(categoryDto);
+        }
+
+        [HttpGet("books/{bookId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDataTransferObjects>))]
+        public IActionResult GetCategoriesOfBook(int bookId)
+        {
+            IEnumerable<Category> categoryies = _categoryRepository.GetCategoriesOfBook(bookId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countreisDtoList = new List<CategoryDataTransferObjects>();
+
+            foreach (var category in categoryies)
+            {
+                countreisDtoList.Add(new CategoryDataTransferObjects
+                {
+                    Name = category.Name,
+                    Id = category.Id
+                });
+            }
+
+            return Ok(countreisDtoList);
+        }
+
+        //To do - GetAllBooksForCategory
     }
+
 }

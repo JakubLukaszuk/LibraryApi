@@ -26,7 +26,7 @@ namespace LibraryApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new Info { Title = "Employee API", Version = "V1" });
+                c.SwaggerDoc("v1", new Info { Title = "Library API", Version = "V1" });
             });
             services.AddMvc();
             var connectionString = Configuration["connectionStrings:libraryDbConnectionString"];
@@ -34,6 +34,8 @@ namespace LibraryApi
  
 
             services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +46,6 @@ namespace LibraryApi
                 app.UseDeveloperExceptionPage();
             }
 
-            //seeding 
             //context.SeedDataContext();
 
             //app.Run(async (context) =>
@@ -52,13 +53,13 @@ namespace LibraryApi
             //    await context.Response.WriteAsync("Hello World!");
             //});
 
+            app.UseMvc();
+
             app.UseSwagger();
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "post API V1");
                 c.RoutePrefix = string.Empty;
             });
-
-            app.UseMvc();
 
         }
     }

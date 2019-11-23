@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibraryApi.Services
 {
-    interface ICategoryRepository
+    public interface ICategoryRepository
     {
         ICollection<Category> GetCategories();
         Category GetCategory(int categoryId);
