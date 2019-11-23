@@ -10,6 +10,7 @@ namespace LibraryApi.Services
     {
         ICollection<Book> GetBooks();
         Book GetBook(int bookId);
+        Book GetBook(string isbn);
         bool IsBookExist(int bookId);
         bool IsDuplicateISBN(string isbn);
         decimal GetBookRating(int bookId);

@@ -11,8 +11,8 @@ namespace LibraryApi.Services
     {
         ICollection<Review> GetReviews();
         Review GetReview(int reviewId);
-        ICollection<Review> GetReviewsOfReviewer(int reviewerId);
         ICollection<Review> GetReviewsOfBook(int bookId);
+        Book GetBookOfAReview(int reviewId);
         bool IsReviewExist(int reviewId);
     }
 }
