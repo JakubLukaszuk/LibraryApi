@@ -76,7 +76,8 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(CountryDataTransferObjects))]
         public IActionResult GetCountryOfAuthor(int authorId)
         {
-            //To do - IsAuthorExist
+
+            //To do - validate authors
              Country country = _countryRepository.GetCountryOfAuthor(authorId);
 
             if (!ModelState.IsValid)
@@ -91,6 +92,38 @@ namespace LibraryApi.Controllers
 
             return Ok(countryDto);
 
+        }
+
+        //api/countries/{countryId}/authors
+        [HttpGet("{countryId}/authors/")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDataTransferObjects>))]
+        public IActionResult GetAuthorsFromCountry(int countryId)
+        {
+            if (!_countryRepository.IsCountryExists(countryId))
+            {
+                return NotFound();
+            }
+
+            IEnumerable<Author> authors = _countryRepository.GetAuthorsFromACountry(countryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            List<AuthorDataTransferObjects> authorsDotsList = new List<AuthorDataTransferObjects>();
+            
+            foreach (var author in authors)
+            {
+                authorsDotsList.Add(
+                    new AuthorDataTransferObjects
+                    {
+                        Id = author.Id,
+                        FirstName = author.FirstName,
+                        LastName = author.LastName
+                    });
+            }
+            return Ok(authorsDotsList);
         }
     }
 }

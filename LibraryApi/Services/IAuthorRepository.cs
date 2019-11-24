@@ -1,11 +1,18 @@
-﻿using System;
+﻿using LibraryApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 
 namespace LibraryApi.Services
 {
-    interface IAuthorRepository
+    public interface IAuthorRepository
     {
+        ICollection<Author> GetAuthors();
+        Author GetAuthor(int authorId);
+        ICollection<Author> GetAuthorsOfBook(int bookId);
+        ICollection<Book> GetBooksByAuthor(int authorId);
+        bool IsAuthorExist(int authorId);
     }
 }

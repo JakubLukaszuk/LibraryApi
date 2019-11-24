@@ -7,7 +7,7 @@ using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 
 namespace LibraryApi.Services
 {
-    interface IReviewRepository
+    public interface IReviewRepository
     {
         ICollection<Review> GetReviews();
         Review GetReview(int reviewId);

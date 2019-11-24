@@ -92,7 +92,38 @@ namespace LibraryApi.Controllers
             return Ok(countreisDtoList);
         }
 
-        //To do - GetAllBooksForCategory
+        //api/countries/{countryId}/authors
+        [HttpGet("{categoryId}/books")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDataTransferObjects>))]
+        public IActionResult GetAllBooksForCategory(int categoryId)
+        {
+            if (!_categoryRepository.IsCategoryExist(categoryId))
+            {
+                return NotFound();
+            }
+
+            IEnumerable<Book> authors = _categoryRepository.GetBooksOfCategories(categoryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            List<BookDataTransferObjects> bookDotsList = new List<BookDataTransferObjects>();
+
+            foreach (var book in bookDotsList)
+            {
+                bookDotsList.Add(
+                    new BookDataTransferObjects
+                    {
+                        Id = book.Id,
+                        Title = book.Title,
+                        Ibsn = book.Ibsn,
+                        DatePublished = book.DatePublished
+                    });
+            }
+            return Ok(bookDotsList);
+        }
     }
 
 }
