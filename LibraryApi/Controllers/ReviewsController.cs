@@ -53,6 +53,9 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDataTransferObjects>))]
         public IActionResult GetReview(int reviewId)
         {
+            if (!_reviewsRepository.IsReviewExist(reviewId))
+                NotFound();
+
             Review review = _reviewsRepository.GetReview(reviewId);
 
             if (!ModelState.IsValid)

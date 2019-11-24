@@ -52,6 +52,9 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDataTransferObjectscs>))]
         public IActionResult GetReviewer(int reviewerId)
         {
+            if (!_reviewerRepository.IsReviewerExist(reviewerId))
+                return NotFound();
+
             Reviewer reviewer = _reviewerRepository.GetReviewer(reviewerId);
 
             if (!ModelState.IsValid)

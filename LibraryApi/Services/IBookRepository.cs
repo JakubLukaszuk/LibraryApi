@@ -12,7 +12,7 @@ namespace LibraryApi.Services
         Book GetBook(int bookId);
         Book GetBook(string isbn);
         bool IsBookExist(int bookId);
-        bool IsDuplicateISBN(string isbn);
+        bool IsDuplicateISBN(string isbn, int bookId);
         decimal GetBookRating(int bookId);
     }
 }

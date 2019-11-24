@@ -52,6 +52,9 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(CategoryDataTransferObjects))]
         public IActionResult GetCategory(int categoryId)
         {
+            if (!_categoryRepository.IsCategoryExist(categoryId))
+                return NotFound();
+
             Category category = _categoryRepository.GetCategory(categoryId);
 
             if (!ModelState.IsValid)
