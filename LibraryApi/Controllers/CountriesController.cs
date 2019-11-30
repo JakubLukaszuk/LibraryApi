@@ -14,9 +14,11 @@ namespace LibraryApi.Controllers
     public class CountriesController : Controller
     {
         private ICountryRepository _countryRepository;
-        public CountriesController(ICountryRepository countryRepository)
+        private IAuthorRepository _authorRepository;
+        public CountriesController(ICountryRepository countryRepository, IAuthorRepository authorRepository)
         {
             _countryRepository = countryRepository;
+            _authorRepository = authorRepository;
         }
 
         //api/countries
@@ -76,8 +78,11 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(CountryDataTransferObjects))]
         public IActionResult GetCountryOfAuthor(int authorId)
         {
+            if (!_authorRepository.IsAuthorExist(authorId))
+            {
+                return NotFound();
+            }
 
-            //To do - validate authors
              Country country = _countryRepository.GetCountryOfAuthor(authorId);
 
             if (!ModelState.IsValid)

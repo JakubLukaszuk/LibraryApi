@@ -43,13 +43,13 @@ namespace LibraryApi.Services
 
         public bool IsBookExist(int bookId)
         {
-            return _bookDbContext.Books.Any(b => b.Id == b.Id);
+            return _bookDbContext.Books.Any(b => b.Id == bookId);
         }
 
         public bool IsDuplicateISBN(string isbn, int bookId)
         {
             var book = _bookDbContext.Books.Where(b =>
-                b.Isbn.Trim().ToUpper() == isbn.Trim().ToUpper() && b.Id == bookId);
+                b.Isbn.Trim().ToUpper() == isbn.Trim().ToUpper() && b.Id == bookId).FirstOrDefault();
 
             return book ==  null ? false : true;
         }

@@ -14,10 +14,12 @@ namespace LibraryApi.Controllers
     public class AuthorsController : Controller
     {
         private IAuthorRepository _authorRepository;
+        private IBookRepository _bookRepository;
 
-        public AuthorsController(IAuthorRepository authorRepository)
+        public AuthorsController(IAuthorRepository authorRepository, IBookRepository bookRepository)
         {
             _authorRepository = authorRepository;
+            _bookRepository = bookRepository;
         }
 
         [HttpGet]
@@ -70,12 +72,17 @@ namespace LibraryApi.Controllers
             return Ok(authorDto);
         }
 
-        [HttpGet("author/{bookId}")]
+        [HttpGet("book/{bookId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDataTransferObjects>))]
         public IActionResult GetAuthorsOfBook(int bookId)
         {
+            if (!_bookRepository.IsBookExist(bookId))
+            {
+                bool x = _bookRepository.IsBookExist(bookId);
+                return NotFound();
+            }
 
             ICollection<Author> authors = _authorRepository.GetAuthorsOfBook(bookId);
 

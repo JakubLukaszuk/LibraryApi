@@ -14,10 +14,12 @@ namespace LibraryApi.Controllers
     public class CategoriesController : Controller
     {
         private ICategoryRepository _categoryRepository;
+        private IBookRepository _bookRepository;
 
-        public CategoriesController(ICategoryRepository categoryRepository)
+        public CategoriesController(ICategoryRepository categoryRepository, IBookRepository bookRepository)
         {
             _categoryRepository = categoryRepository;
+            _bookRepository = bookRepository;
         }
 
         [HttpGet]
@@ -76,6 +78,11 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDataTransferObjects>))]
         public IActionResult GetCategoriesOfBook(int bookId)
         {
+            if (!_bookRepository.IsBookExist(bookId))
+            {
+                return NotFound();
+            }
+
             IEnumerable<Category> categoryies = _categoryRepository.GetCategoriesOfBook(bookId);
 
             if (!ModelState.IsValid)

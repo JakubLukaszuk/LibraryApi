@@ -11,5 +11,6 @@ namespace LibraryApi.Services
         Country GetCountryOfAuthor(int authorId);
         ICollection<Author> GetAuthorsFromACountry(int countryId);
         bool IsCountryExists(int countryId);
+        bool isDuplicateCountryName(int countryId, string countryName);
     }
 }

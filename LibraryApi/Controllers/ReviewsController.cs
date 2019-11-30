@@ -14,10 +14,12 @@ namespace LibraryApi.Controllers
     public class ReviewsController : Controller
     {
         private IReviewRepository _reviewsRepository;
+        private IBookRepository _bookRepository;
 
-        public ReviewsController(IReviewRepository reviewsRepository)
+        public ReviewsController(IReviewRepository reviewsRepository, IBookRepository bookRepository)
         {
             _reviewsRepository = reviewsRepository;
+            _bookRepository = bookRepository;
         }
 
         [HttpGet]
@@ -80,6 +82,11 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDataTransferObjects>))]
         public IActionResult GetReviewsOfBook(int bookId)
         {
+            if (!_bookRepository.IsBookExist(bookId))
+            {
+                return NotFound();
+            }
+
             ICollection<Review> reviews = _reviewsRepository.GetReviewsOfBook(bookId);
 
             var reviewsDtosList = new List<ReviewDataTransferObjects>();

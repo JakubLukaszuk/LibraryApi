@@ -39,5 +39,13 @@ namespace LibraryApi.Services
         {
             return _contryContext.Categories.Any(c => c.Id == countryId);
         }
+
+        public bool isDuplicateCountryName(int countryId, string countryName)
+        {
+            var country = _contryContext.Countries.Where(c =>
+                c.Name.Trim().ToUpper() == countryName.Trim().ToUpper() && c.Id == countryId).FirstOrDefault();
+
+            return country == null ? false : true;
+        }
     }
 }
