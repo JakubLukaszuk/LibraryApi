@@ -13,5 +13,11 @@ namespace LibraryApi.Services
         Reviewer GetRevieverByReview(int reviewId);
         ICollection<Review> GetReviewsByReviewer(int reviewerId);
         bool IsReviewerExist (int reviewerId);
+
+        bool CreateReviewer(Reviewer reviewer);
+        bool DeleteReviewer(Reviewer reviewer);
+        bool UpdaeReviewer(Reviewer reviewer);
+        bool Save();
+
     }
 }

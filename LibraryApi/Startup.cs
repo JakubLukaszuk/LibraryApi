@@ -28,7 +28,8 @@ namespace LibraryApi
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new Info { Title = "Library API", Version = "V1" });
             });
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             var connectionString = Configuration["connectionStrings:libraryDbConnectionString"];
             services.AddDbContext<LibraryDbContext>(c => c.UseSqlServer(connectionString));
  

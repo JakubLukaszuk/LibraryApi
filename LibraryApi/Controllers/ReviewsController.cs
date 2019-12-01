@@ -15,11 +15,13 @@ namespace LibraryApi.Controllers
     {
         private IReviewRepository _reviewsRepository;
         private IBookRepository _bookRepository;
+        private IReviewerRepository _reviewerRepository;
 
-        public ReviewsController(IReviewRepository reviewsRepository, IBookRepository bookRepository)
+        public ReviewsController(IReviewRepository reviewsRepository, IBookRepository bookRepository, IReviewerRepository reviewerRepository)
         {
             _reviewsRepository = reviewsRepository;
             _bookRepository = bookRepository;
+            _reviewerRepository = reviewerRepository;
         }
 
         [HttpGet]
@@ -49,7 +51,7 @@ namespace LibraryApi.Controllers
             return Ok(reviewsDtosList);
         }
 
-        [HttpGet("{reviewId}")]
+        [HttpGet("{reviewId}", Name = "GetReview")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDataTransferObjects>))]
@@ -126,6 +128,114 @@ namespace LibraryApi.Controllers
             };
 
             return Ok(bookDtos);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Review))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateReview([FromBody] Review reviewToCreate)
+        {
+            if (reviewToCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_reviewerRepository.IsReviewerExist(reviewToCreate.Reviewer.Id))
+            {
+                ModelState.AddModelError("", "Reviewer dosen't exist!");
+            }
+
+            if (!_bookRepository.IsBookExist(reviewToCreate.Book.Id))
+            {
+                ModelState.AddModelError("", "Book dosen't exist!");
+            }
+
+            reviewToCreate.Book = _bookRepository.GetBook(reviewToCreate.Book.Id);
+            reviewToCreate.Reviewer = _reviewerRepository.GetReviewer(reviewToCreate.Reviewer.Id);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewsRepository.CreateReview(reviewToCreate))
+            {
+                ModelState.AddModelError("", "Somethink went wrong when saing review! Review has not been saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCountry", new { reviewId = reviewToCreate.Id }, reviewToCreate);
+        }
+
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateReview(int reviewId, [FromBody] Review reviewToUpdate)
+        {
+            if (reviewToUpdate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_reviewerRepository.IsReviewerExist(reviewId))
+            {
+                ModelState.AddModelError("", "Review dosen't exist!");
+            }
+
+            if (reviewId !=  reviewToUpdate.Id)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_reviewerRepository.IsReviewerExist(reviewToUpdate.Reviewer.Id))
+            {
+                ModelState.AddModelError("", "Reviewer dosen't exist!");
+            }
+
+            if (!_bookRepository.IsBookExist(reviewToUpdate.Book.Id))
+            {
+                ModelState.AddModelError("", "Book dosen't exist!");
+            }
+
+            reviewToUpdate.Book = _bookRepository.GetBook(reviewToUpdate.Book.Id);
+            reviewToUpdate.Reviewer = _reviewerRepository.GetReviewer(reviewToUpdate.Reviewer.Id);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewsRepository.UpdateReview(reviewToUpdate))
+            {
+                ModelState.AddModelError("", "Somethink went wrong when updating review! Review has not been saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!_reviewsRepository.IsReviewExist(reviewId))
+                return NotFound();
+
+            var reviewToDelete = _reviewsRepository.GetReview(reviewId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewsRepository.DeleteReview(reviewToDelete))
+            {
+                ModelState.AddModelError("", "Somethink went wrong when deleting review! Review has not been deleted");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 }

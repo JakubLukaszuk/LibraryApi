@@ -15,6 +15,18 @@ namespace LibraryApi.Services
             _reviewContext = reviewContext;
         }
 
+        public bool CreateReview(Review review)
+        {
+            _reviewContext.Add(review);
+            return Save();
+        }
+
+        public bool DeleteReview(Review review)
+        {
+            _reviewContext.Remove(review);
+            return Save();
+        }
+
         public Book GetBookOfAReview(int reviewId)
         {
             return _reviewContext.Reviews.Where(r => r.Id == reviewId).Select(b => b.Book).FirstOrDefault();
@@ -38,6 +50,17 @@ namespace LibraryApi.Services
         public bool IsReviewExist(int reviewId)
         {
             return _reviewContext.Reviews.Any(r => r.Id == reviewId);
+        }
+
+        public bool Save()
+        {
+            return _reviewContext.SaveChanges() >= 0 ? true : false;
+        }
+
+        public bool UpdateReview(Review review)
+        {
+            _reviewContext.Update(review);
+            return Save();
         }
     }
 }

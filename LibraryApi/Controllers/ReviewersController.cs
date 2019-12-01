@@ -46,7 +46,7 @@ namespace LibraryApi.Controllers
             return Ok(reviewersDtosList);
         }
 
-        [HttpGet("{reviewerId}")]
+        [HttpGet("{reviewerId}", Name = "GetReviewer") ]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDataTransferObjectscs>))]
@@ -120,6 +120,41 @@ namespace LibraryApi.Controllers
             };
             
             return Ok(reviewer);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Reviewer))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateReviewer([FromBody] Reviewer reviewerToCreate)
+        {
+            if (reviewerToCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var country = _reviewerRepository.GetReviewers().Where(r =>
+                r.FirstName.Trim().ToUpper() == reviewerToCreate.FirstName.Trim().ToUpper()&&
+                r.LastName.Trim().ToUpper() == reviewerToCreate.LastName.Trim().ToUpper()).FirstOrDefault();
+                
+
+            if (country != null)
+            {
+                ModelState.AddModelError("", $"Reviewer: {reviewerToCreate.FirstName}   {reviewerToCreate.LastName} already exist");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.CreateReviewer(reviewerToCreate))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong. {reviewerToCreate.FirstName} {reviewerToCreate.LastName} not saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetReviewer", new { reviewerId = reviewerToCreate.Id }, reviewerToCreate);
         }
 
     }

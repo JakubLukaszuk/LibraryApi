@@ -39,5 +39,28 @@ namespace LibraryApi.Services
         {
             return _reviewerContext.Reviewers.Any(r => r.Id == reviewerId);
         }
+
+        public bool CreateReviewer(Reviewer reviewer)
+        {
+            _reviewerContext.Add(reviewer);
+            return Save();
+        }
+
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            _reviewerContext.Remove(reviewer);
+            return Save();
+        }
+
+        public bool UpdaeReviewer(Reviewer reviewer)
+        {
+            _reviewerContext.Update(reviewer);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            return _reviewContext.SaveChanges() >= 0 ? true : false;
+        }
     }
 }
