@@ -15,6 +15,18 @@ namespace LibraryApi.Services
             _contryContext = contryContext;
         }
 
+        public bool CreateCountry(Country country)
+        {
+            _contryContext.Add(country);
+            return Save();
+        }
+
+        public bool DeleteCountry(Country country)
+        {
+             _contryContext.Remove(country);
+            return Save();
+        }
+
         public ICollection<Author> GetAuthorsFromACountry(int countryId)
         {
             return _contryContext.Authors.Where(c => c.Id == countryId).ToList();
@@ -46,6 +58,18 @@ namespace LibraryApi.Services
                 c.Name.Trim().ToUpper() == countryName.Trim().ToUpper() && c.Id == countryId).FirstOrDefault();
 
             return country == null ? false : true;
+        }
+
+        public bool Save()
+        {
+            int  saved = _contryContext.SaveChanges();
+            return saved >= 0 ? true : false;
+        }
+
+        public bool UpdateCountry(Country country)
+        {
+            _contryContext.Update(country);
+            return Save();
         }
     }
 }
