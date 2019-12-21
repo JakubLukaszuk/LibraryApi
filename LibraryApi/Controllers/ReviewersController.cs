@@ -14,11 +14,14 @@ namespace LibraryApi.Controllers
     public  class ReviewersController : Controller
     {
         private IReviewerRepository _reviewerRepository;
+        private IReviewRepository reviewRepository;
 
-        public ReviewersController(IReviewerRepository reviewerRepository)
+        public ReviewersController(IReviewerRepository reviewerRepository, IReviewRepository reviewRepository)
         {
-            _reviewerRepository = reviewerRepository;
+            this.reviewRepository = reviewRepository;
+            this._reviewerRepository = reviewerRepository;
         }
+
 
         [HttpGet]
         [ProducesResponseType(400)]
@@ -155,6 +158,75 @@ namespace LibraryApi.Controllers
             }
 
             return CreatedAtRoute("GetReviewer", new { reviewerId = reviewerToCreate.Id }, reviewerToCreate);
+        }
+
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.IsReviewerExist(reviewerId))
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reviewer = _reviewerRepository.GetReviewer(reviewerId);
+            var reviews = _reviewerRepository.GetReviewsByReviewer(reviewerId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewer))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong. {reviewer.FirstName} {reviewer.LastName} not deleted");
+                return StatusCode(500, ModelState);
+            }
+
+            if (!reviewRepository.DeleteReviews(reviews.ToList()))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong. {reviewer.FirstName} {reviewer.LastName} reviews not deleted");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateReviewer(int reviewerId, [FromBody] Reviewer updatedReviewerInfno)
+        {
+            if (updatedReviewerInfno == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (reviewerId != updatedReviewerInfno.Id)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_reviewerRepository.IsReviewerExist(reviewerId))
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.UpdaeReviewer(updatedReviewerInfno))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong when updating: {updatedReviewerInfno.FirstName} {updatedReviewerInfno.LastName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
 
     }

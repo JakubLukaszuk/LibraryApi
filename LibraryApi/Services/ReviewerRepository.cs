@@ -60,7 +60,7 @@ namespace LibraryApi.Services
 
         public bool Save()
         {
-            return _reviewContext.SaveChanges() >= 0 ? true : false;
+            return _reviewerContext.SaveChanges() >= 0 ? true : false;
         }
     }
 }

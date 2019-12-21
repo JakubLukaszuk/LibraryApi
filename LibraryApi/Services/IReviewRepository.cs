@@ -14,5 +14,9 @@ namespace LibraryApi.Services
         ICollection<Review> GetReviewsOfBook(int bookId);
         Book GetBookOfAReview(int reviewId);
         bool IsReviewExist(int reviewId);
+        bool DeleteReview(Review reviewToDelete);
+        bool CreateReview(Review reviewToCreate);
+        bool UpdateReview(Review reviewToUpdate);
+        bool DeleteReviews(List<Review> list);
     }
 }

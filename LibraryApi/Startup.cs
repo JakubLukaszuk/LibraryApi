@@ -52,10 +52,6 @@ namespace LibraryApi
 
             //context.SeedDataContext();
 
-            //app.Run(async (context) =>
-            //{
-            //    await context.Response.WriteAsync("Hello World!");
-            //});
 
             app.UseMvc();
 
