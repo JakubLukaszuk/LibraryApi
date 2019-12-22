@@ -15,6 +15,19 @@ namespace LibraryApi.Services
             _authorContext = authorContext;
         }
 
+        public bool CreateAuthor(Author author)
+        {
+            _authorContext.Add(author);
+            return Save();
+        }
+
+        public bool DeleteAuthor(Author author)
+        {
+            _authorContext.Remove(author);
+            return Save();
+        }
+
+
         public Author GetAuthor(int authorId)
         {
             return _authorContext.Authors.Where(a => a.Id == authorId).FirstOrDefault();
@@ -39,5 +52,18 @@ namespace LibraryApi.Services
         {
             return _authorContext.Authors.Any(a => a.Id == authorId);
         }
+
+        public bool Save()
+        {
+            int saved = _authorContext.SaveChanges();
+            return saved >= 0 ? true : false;
+        }
+
+        public bool UpdateAuthor(Author author)
+        {
+            _authorContext.Update(author);
+            return Save();
+        }
+
     }
 }

@@ -14,5 +14,10 @@ namespace LibraryApi.Services
         ICollection<Author> GetAuthorsOfBook(int bookId);
         ICollection<Book> GetBooksByAuthor(int authorId);
         bool IsAuthorExist(int authorId);
+
+        bool CreateAuthor(Author author);
+        bool UpdateAuthor(Author author);
+        bool DeleteAuthor(Author author);
+        bool Save();
     }
 }

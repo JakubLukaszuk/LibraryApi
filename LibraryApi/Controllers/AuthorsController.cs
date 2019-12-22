@@ -47,7 +47,7 @@ namespace LibraryApi.Controllers
         }
 
 
-        [HttpGet("{authorId}")]
+        [HttpGet("{authorId}", Name="GetAuthor")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDataTransferObjects>))]
@@ -128,6 +128,104 @@ namespace LibraryApi.Controllers
                 });
             }
             return Ok(booksDtoList);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Author))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateAuthor([FromBody] Author authorToCreate)
+        {
+            if (authorToCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (_authorRepository.IsAuthorExist(authorToCreate.Id))
+            {
+                ModelState.AddModelError("", "Author exist");
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_authorRepository.CreateAuthor(authorToCreate))
+            {
+                ModelState.AddModelError("", "Somethink went wrong when saving author! Review has not been saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetAuthor", new { reviewId = authorToCreate.Id }, authorToCreate);
+        }
+
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateAuthor([FromBody] Author authorToUpdate)
+        {
+            if (authorToUpdate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_authorRepository.IsAuthorExist(authorToUpdate.Id))
+            {
+                ModelState.AddModelError("", "Author not exist");
+            }
+
+            if (!ModelState.IsValid)
+                return StatusCode(404, ModelState);
+
+            if (!_authorRepository.UpdateAuthor(authorToUpdate))
+            {
+                ModelState.AddModelError("", "Somethink went wrong when updating author! Review has not been saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+
+        //api/countries/countryId
+        [HttpDelete("{authorId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteAuthor(int authorId)
+        {
+            if (!_authorRepository.IsAuthorExist(authorId))
+            {
+                return NotFound();
+            }
+
+            Author authorToDelete = _authorRepository.GetAuthor(authorId);
+
+            ICollection<Book> books = _authorRepository.GetBooksByAuthor(authorId);
+
+
+            if (books.Count() > 0)
+            {
+                ModelState.AddModelError("", "At first you have to delete this books: \n" + books.ToString() +
+                                             $"Has not {authorToDelete.FirstName} {authorToDelete.LastName} delted");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_authorRepository.DeleteAuthor(authorToDelete))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong.Has not {authorToDelete.FirstName} {authorToDelete.LastName} delted");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
 
     }
