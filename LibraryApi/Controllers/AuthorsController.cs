@@ -160,7 +160,7 @@ namespace LibraryApi.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPut]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

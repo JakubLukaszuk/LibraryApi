@@ -46,5 +46,28 @@ namespace LibraryApi.Services
 
             return category == null ? false : true;
         }
+
+        public bool CreateCategory(Category category)
+        {
+            _categoryContext.Add(category);
+            return Save();
+        }
+
+        public bool UpdateCategory(Category category)
+        {
+            _categoryContext.Update(category);
+            return Save();
+        }
+
+        public bool DeleteCategory(Category category)
+        {
+            _categoryContext.Remove(category);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            return _categoryContext.SaveChanges() >=0 ? true : false;
+        }
     }
 }

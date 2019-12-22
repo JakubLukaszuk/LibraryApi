@@ -48,7 +48,7 @@ namespace LibraryApi.Controllers
             return Ok(countreisDtoList);
         }
 
-        [HttpGet("{categoryId}")]
+        [HttpGet("{categoryId}" , Name ="GetCategory")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(CategoryDataTransferObjects))]
@@ -133,6 +133,110 @@ namespace LibraryApi.Controllers
                     });
             }
             return Ok(bookDotsList);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Category))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateCategory([FromBody] Category categoryToCreate)
+        {
+            if (categoryToCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var country = _categoryRepository.GetCategories().Where(c =>
+                c.Name.Trim().ToUpper() == categoryToCreate.Name.Trim().ToUpper()).FirstOrDefault();
+
+            if (country != null)
+            {
+                ModelState.AddModelError("", $"Category: {categoryToCreate.Name} already exist");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.CreateCategory(categoryToCreate))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong. {categoryToCreate.Name} not saved");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCategory", new { countryId = categoryToCreate.Id }, categoryToCreate);
+        }
+
+
+        [HttpPut]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateCategory([FromBody] Category categoryToUpdateInfo)
+        {
+            if (categoryToUpdateInfo == null)
+            {
+                return BadRequest(ModelState);
+            }
+;
+
+            if (!_categoryRepository.IsCategoryExist(categoryToUpdateInfo.Id))
+            {
+                ModelState.AddModelError("", $"Category: {categoryToUpdateInfo.Name} not exist");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.UpdateCategory(categoryToUpdateInfo))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong. {categoryToUpdateInfo.Name} not updated");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        //api/countries/countryId
+        [HttpDelete("{categoryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteAuthor(int categoryId)
+        {
+            if (!_categoryRepository.IsCategoryExist(categoryId))
+            {
+                return NotFound();
+
+            }
+
+            Category categoyToDelete = _categoryRepository.GetCategory(categoryId);
+
+            ICollection<Book> books = _categoryRepository.GetBooksOfCategories(categoryId);
+
+
+            if (books.Count() > 0)
+            {
+                ModelState.AddModelError("", "At first you have to delete this books: \n" + books.ToString() +
+                                             $"Has not {categoyToDelete.Name} delted");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.DeleteCategory(categoyToDelete))
+            {
+                ModelState.AddModelError("", $"Somethink went wrong.Has not {categoyToDelete.Name} delted");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 
